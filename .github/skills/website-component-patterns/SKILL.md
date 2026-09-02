@@ -1,6 +1,6 @@
 ---
 name: website-component-patterns
-description: "Use when writing or editing React/TypeScript component code in packages/website. Covers colors reference, classNames formatting for long class lists, render functions instead of JSX comments, meaningful array callback variable names, switch-case brace/spacing rules, and named functions in useEffect."
+description: "Use when writing or editing React/TypeScript component code in packages/website. Covers colors reference, classNames formatting for long class lists, render functions instead of JSX comments, avoiding unnecessary comments, meaningful array callback variable names, switch-case brace/spacing rules, and named functions in useEffect."
 ---
 
 # Component Patterns (website)
@@ -31,13 +31,17 @@ className="flex items-center gap-2 rounded-lg px-4 py-2 bg-primary text-white op
 
 When a component's `return` block contains distinct logical sections, extract each section into a named `renderXxx` function inside the component body rather than labelling blocks with `{/* Comment */}`. The function name replaces the comment — no additional comments are needed.
 
+Render functions must always use a block body with an explicit `return`, never a parenthesized implicit-return arrow function.
+
 ```tsx
 // ✅ Correct
-const renderStickyHeader = () => (
-  <div className="sticky top-0 bg-white">...</div>
-);
+const renderStickyHeader = () => {
+  return <div className="sticky top-0 bg-white">...</div>;
+};
 
-const renderEmptyState = () => <div>No items yet</div>;
+const renderEmptyState = () => {
+  return <div>No items yet</div>;
+};
 
 return (
   <div>
@@ -46,7 +50,12 @@ return (
   </div>
 );
 
-// ❌ Avoid
+// ❌ Avoid — implicit-return arrow function
+const renderStickyHeader = () => (
+  <div className="sticky top-0 bg-white">...</div>
+);
+
+// ❌ Avoid — JSX comments instead of render functions
 return (
   <div>
     {/* Sticky header */}
@@ -61,6 +70,28 @@ return (
 Apply this pattern consistently when building or editing any component that has more than one logical section in its render output.
 
 **Render helpers must live inside the component.** Define `renderXxx` (and any similar render helpers) in the component body only. Never place a render method outside the component (e.g. at module scope or in another file) — it should always be a function declared inside the component so it closes over that component's props and state.
+
+## Avoid unnecessary comments
+
+Don't add comments that just restate what the next line of code already shows. Only write a comment when it conveys something the code itself can't — a non-obvious reason, a gotcha, or a warning about a subtle side effect — and keep it to one short line.
+
+```tsx
+// ✅ Correct — explains a non-obvious reason
+// Safari fires blur before click, so defer to let the click handler run first
+setTimeout(() => setIsOpen(false), 0);
+
+// ❌ Avoid — restates the obvious
+// Set loading to true
+setLoading(true);
+
+// ❌ Avoid — restates the obvious
+// Loop through the notes and render each one
+{
+  notes.map((note) => renderNote(note));
+}
+```
+
+This applies to JSX section labels too — use a named `renderXxx` function (see above) instead of a `{/* Comment */}` label, rather than adding both.
 
 ## Use meaningful variable names in array callbacks
 
