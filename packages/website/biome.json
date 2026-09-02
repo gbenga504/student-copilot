@@ -30,18 +30,6 @@
       "tailwindDirectives": true
     }
   },
-  "overrides": [
-    {
-      "includes": ["app/welcome/**"],
-      "linter": {
-        "rules": {
-          "a11y": {
-            "noSvgWithoutTitle": "off"
-          }
-        }
-      }
-    }
-  ],
   "assist": {
     "enabled": true,
     "actions": {

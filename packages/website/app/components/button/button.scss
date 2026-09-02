@@ -1,0 +1,151 @@
+@reference "../../globals.css";
+
+@layer components {
+  .button {
+    @apply inline-flex items-center transition-all outline-none w-fit text-sm cursor-pointer;
+
+    &.button-contained {
+      &.button-primary {
+        @apply bg-primary text-white;
+
+        &:hover,
+        &:active {
+          @apply bg-primary-dark;
+        }
+
+        &:focus-visible {
+          @apply ring-2 ring-primary ring-offset-2;
+        }
+
+        &.button-disabled {
+          @apply bg-primary/50 cursor-not-allowed;
+        }
+      }
+
+      &.button-gray {
+        @apply bg-white text-black;
+
+        &:hover,
+        &:active {
+          @apply bg-gray-500;
+        }
+
+        &:focus-visible {
+          @apply ring-2 ring-primary ring-offset-2;
+        }
+
+        &.button-disabled {
+          @apply cursor-not-allowed bg-white/50;
+        }
+      }
+    }
+
+    &.button-outlined {
+      &.button-primary {
+        @apply border border-primary text-primary;
+
+        &:hover,
+        &:active {
+          @apply border-primary-dark text-primary-dark;
+        }
+
+        &:focus-visible {
+          @apply ring-2 ring-primary ring-offset-2;
+        }
+
+        &.button-disabled {
+          @apply border-primary/50 text-primary/50 cursor-not-allowed;
+        }
+      }
+
+      &.button-gray {
+        @apply border border-gray-300 text-white;
+
+        &:hover,
+        &:active {
+          @apply bg-gray-400;
+        }
+
+        &:focus-visible {
+          @apply ring-2 ring-primary ring-offset-2;
+        }
+
+        &.button-disabled {
+          @apply cursor-not-allowed border-gray-200 text-white/50;
+        }
+      }
+    }
+
+    &.button-text {
+      &.button-primary {
+        @apply text-primary;
+
+        &:hover,
+        &:active {
+          @apply bg-primary/5;
+        }
+
+        &:focus-visible {
+          @apply ring-3 ring-primary;
+        }
+
+        &.button-disabled {
+          @apply bg-transparent cursor-not-allowed;
+        }
+      }
+
+      &.button-gray {
+        @apply text-gray-300;
+
+        &:hover,
+        &:active {
+          @apply bg-app-gray-200;
+        }
+
+        &:focus-visible {
+          @apply ring-3 ring-primary;
+        }
+
+        &.button-disabled {
+          @apply bg-transparent cursor-not-allowed;
+        }
+      }
+    }
+
+    &.button-xLarge {
+      @apply rounded-md px-2 h-11;
+
+      &.button-circle {
+        @apply rounded-full h-max w-max px-5 py-5;
+      }
+    }
+
+    &.button-large {
+      @apply rounded-md px-2 h-9;
+
+      &.button-circle {
+        @apply rounded-full h-max w-max px-4 py-4;
+      }
+    }
+
+    &.button-medium {
+      @apply rounded-md px-2 h-7;
+
+      &.button-circle {
+        @apply rounded-full h-max w-max px-3 py-3;
+      }
+    }
+
+    &.button-small {
+      @apply rounded-md px-2 h-5;
+
+      &.button-circle {
+        @apply rounded-full h-max w-max px-2 py-2;
+      }
+    }
+
+    &.button-fullWidth {
+      @apply w-full;
+    }
+  }
+}
