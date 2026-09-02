@@ -5,7 +5,7 @@ import type { Route } from "../dashboard._index/+types/route";
 
 export function meta(_args: Route.MetaArgs) {
   return [
-    { title: "Dashboard" },
+    { title: "My notes" },
     { name: "description", content: "Your notes dashboard" },
   ];
 }
