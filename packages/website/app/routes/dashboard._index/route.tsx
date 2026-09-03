@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { Fragment } from "react";
 import { Button } from "~/components/button/button";
 import type { Route } from "../dashboard._index/+types/route";
+import { NotesEmptyState } from "./components/notes-empty-state";
 
 export function meta(_args: Route.MetaArgs) {
   return [
@@ -27,5 +28,18 @@ export default function DashboardIndexPage() {
     );
   };
 
-  return <Fragment>{renderHeader()}</Fragment>;
+  const renderMainContent = () => {
+    return (
+      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <NotesEmptyState />
+      </main>
+    );
+  };
+
+  return (
+    <Fragment>
+      {renderHeader()}
+      {renderMainContent()}
+    </Fragment>
+  );
 }
