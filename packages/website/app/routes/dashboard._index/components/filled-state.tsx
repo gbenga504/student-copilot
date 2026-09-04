@@ -39,7 +39,7 @@ export function FilledState({ noteGroups }: FilledStateProps) {
         key={note.id}
         className="flex cursor-pointer items-center gap-3 p-2 hover:bg-app-gray-200 rounded-xl"
       >
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#4E4D4B]">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-app-gray-150">
           <File className="size-4 text-app-gray-100" />
         </div>
         <div className="min-w-0 flex-1">
