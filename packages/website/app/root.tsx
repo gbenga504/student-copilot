@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import dayjs from "~/libs/dayjs";
 
 import type { Route } from "./+types/root";
 import "./globals.css";
@@ -43,6 +44,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  dayjs.locale("en");
+
   return <Outlet />;
 }
 

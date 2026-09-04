@@ -19,6 +19,7 @@
     "@react-router/serve": "^8",
     "@tailwindcss/postcss": "^4.3.3",
     "classnames": "^2.5.1",
+    "dayjs": "^1.11.23",
     "isbot": "^5.1.36",
     "lucide-react": "^1.39.0",
     "postcss": "^8.5.26",

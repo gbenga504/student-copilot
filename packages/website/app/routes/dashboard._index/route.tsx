@@ -2,7 +2,8 @@ import { Plus } from "lucide-react";
 import { Fragment } from "react";
 import { Button } from "~/components/button/button";
 import type { Route } from "../dashboard._index/+types/route";
-import { NotesEmptyState } from "./components/notes-empty-state";
+import { FilledState, noteGroups } from "./components/filled-state";
+import { EmptyState } from "./components/empty-state";
 
 export function meta(_args: Route.MetaArgs) {
   return [
@@ -12,6 +13,8 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export default function DashboardIndexPage() {
+  const hasNotes = noteGroups.length > 0;
+
   const renderHeader = () => {
     return (
       <header className="flex justify-end px-6 py-4">
@@ -31,7 +34,9 @@ export default function DashboardIndexPage() {
   const renderMainContent = () => {
     return (
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-        <NotesEmptyState />
+        <div className="flex flex-1 w-full max-w-2xl mx-auto">
+          {hasNotes ? <FilledState noteGroups={noteGroups} /> : <EmptyState />}
+        </div>
       </main>
     );
   };

@@ -2,7 +2,7 @@ import { Lock, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/button/button";
 
-export function NotesEmptyState() {
+export function EmptyState() {
   const [isPrivacyNoticeVisible, setIsPrivacyNoticeVisible] = useState(true);
 
   const renderLockBadge = () => {
@@ -80,15 +80,14 @@ export function NotesEmptyState() {
   };
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-6 py-10">
-      <div className="flex w-full max-w-2xl flex-col items-center gap-6">
-        {renderLockBadge()}
-        {renderHeading()}
-        {renderPrivateNotice()}
-        {renderPrivacyBanner()}
-        <hr className="w-full border-app-gray-200" />
-        {renderFirstNoteCta()}
-      </div>
+    <div className="flex flex-col items-center justify-center gap-6">
+      {renderLockBadge()}
+      {renderHeading()}
+      {renderPrivateNotice()}
+      {renderPrivacyBanner()}
+
+      <hr className="w-full border-app-gray-200" />
+      {renderFirstNoteCta()}
     </div>
   );
 }
