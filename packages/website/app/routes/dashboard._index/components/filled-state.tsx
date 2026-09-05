@@ -40,13 +40,13 @@ export function FilledState({ noteGroups }: FilledStateProps) {
         className="flex cursor-pointer items-center gap-3 rounded-xl p-2 outline-none hover:bg-app-gray-200 focus-visible:ring-2 focus-visible:ring-primary"
       >
         <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-app-gray-150">
-          <File className="size-4 text-app-gray-100" />
+          <File className="size-4" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-base text-white">{note.title}</p>
-          <p className="text-sm text-app-gray-100">{note.author}</p>
+          <p className="text-sm">{note.author}</p>
         </div>
-        <span className="shrink-0 text-xs text-app-gray-100">
+        <span className="shrink-0 text-xs">
           {dayjs(note.createdAt).format("HH:mm")}
         </span>
       </li>
@@ -65,9 +65,7 @@ export function FilledState({ noteGroups }: FilledStateProps) {
 
     return (
       <section key={noteGroup.date} className="flex flex-col">
-        <h2 className="px-2 pt-4 pb-2 text-sm font-bold text-app-gray-100">
-          {label}
-        </h2>
+        <h2 className="px-2 pt-4 pb-2 text-sm font-bold">{label}</h2>
 
         <ul className="flex list-none flex-col">
           {noteGroup.notes.map((note) => renderNoteRow(note))}

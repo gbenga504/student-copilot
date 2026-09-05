@@ -8,7 +8,7 @@ export function EmptyState() {
   const renderLockBadge = () => {
     return (
       <div className="flex size-9 items-center justify-center rounded-lg bg-app-gray-200">
-        <Lock className="size-4 text-app-gray-100" />
+        <Lock className="size-4" />
       </div>
     );
   };
@@ -17,14 +17,14 @@ export function EmptyState() {
     return (
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="font-serif text-4xl text-white">My notes</h1>
-        <p className="text-app-gray-100">Notes that are just for you.</p>
+        <p>Notes that are just for you.</p>
       </div>
     );
   };
 
   const renderPrivateNotice = () => {
     return (
-      <div className="flex items-center gap-1.5 text-xs text-app-gray-100">
+      <div className="flex items-center gap-1.5 text-xs">
         <Lock className="size-3" />
         Your private notes
       </div>
@@ -54,7 +54,7 @@ export function EmptyState() {
             <X className="size-4" />
           </Button>
         </div>
-        <p className="mt-2 text-sm text-app-gray-100">
+        <p className="mt-2 text-sm">
           Your notes live here by default. You can always view all your notes in
           this section
         </p>
