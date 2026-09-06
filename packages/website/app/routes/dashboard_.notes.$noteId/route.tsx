@@ -7,9 +7,8 @@ import dayjs from "~/libs/dayjs";
 import { constructURL, ROUTE_IDS } from "~/libs/route-util";
 
 import type { Route } from "./+types/route";
-import { AskBar } from "./components/ask-bar";
 import { NoteEditor } from "./components/note-editor/note-editor";
-import { TranscriptionButton } from "./components/transcription-button";
+import { NoteFooter } from "./components/note-footer/note-footer";
 
 export function meta({ params }: Route.MetaArgs) {
   const note = getNoteByIdOrThrow(params.noteId);
@@ -69,20 +68,12 @@ export default function NoteDetailsPage() {
     );
   };
 
-  const renderFooter = () => {
-    return (
-      <div className="mx-auto flex w-full max-w-4xl items-center gap-3 px-6 py-4">
-        <TranscriptionButton />
-        <AskBar />
-      </div>
-    );
-  };
-
   return (
     <div className="flex h-screen flex-col bg-app-gray-300">
       {renderHeader()}
       {renderContent()}
-      {renderFooter()}
+
+      <NoteFooter />
     </div>
   );
 }

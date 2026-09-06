@@ -19,6 +19,7 @@ export const AskBar = () => {
           colorTheme="gray"
           shape="circle"
           aria-label="Record audio"
+          className="hover:bg-app-gray-150"
         >
           <Mic size={16} />
         </Button>
