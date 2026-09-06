@@ -26,7 +26,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       className,
       ...rest
     },
-    ref
+    ref,
   ) => {
     return (
       <div
@@ -35,7 +35,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {
             "w-full": fullWidth,
           },
-          classes?.container
+          classes?.container,
         )}
       >
         {label && (
@@ -76,5 +76,5 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
       </div>
     );
-  }
+  },
 );

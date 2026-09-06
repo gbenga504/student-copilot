@@ -1,13 +1,12 @@
-import { Input } from "~/components/input/input";
+import { Textarea } from "~/components/textarea/textarea";
 
 export const AskBar = () => {
   return (
-    <Input
-      fullWidth
+    <Textarea
       placeholder="Ask anything"
-      className="text-base"
+      fullWidth
       classes={{
-        inputContainer: "rounded-full h-15 pl-6 pr-3",
+        container: "rounded-full pl-6 pr-3 h-15",
       }}
     />
   );
