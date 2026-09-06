@@ -1,0 +1,17 @@
+@reference "../../globals.css";
+
+@layer components {
+  .textarea {
+    &.textarea-container {
+      @apply flex items-center;
+      @apply relative w-full py-2 px-3 rounded-lg;
+      @apply border border-app-gray-150 bg-app-gray-200;
+      @apply focus-within:ring-2 focus-within:ring-primary focus-within:border-primary;
+    }
+
+    & textarea {
+      @apply w-full outline-none;
+      @apply text-base resize-none;
+    }
+  }
+}
