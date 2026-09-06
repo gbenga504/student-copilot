@@ -9,7 +9,7 @@ export const AskBar = () => {
       placeholder="Ask anything"
       fullWidth
       classes={{
-        container: "rounded-full pl-6 pr-3 h-15",
+        container: "rounded-full pl-6 pr-3 h-auto",
       }}
       endAdornment={
         <Button
