@@ -7,6 +7,7 @@ type TextAreaProps = React.InputHTMLAttributes<HTMLTextAreaElement> & {
   fullWidth?: boolean;
   label?: string;
   classes?: { container?: string; textarea?: string };
+  endAdornment?: React.ReactNode;
 };
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
@@ -18,6 +19,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       required = false,
       label,
       classes,
+      endAdornment,
       ...rest
     },
     ref,
@@ -47,6 +49,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           rows={1}
           {...rest}
         />
+
+        {endAdornment && <div className="ml-1">{endAdornment}</div>}
 
         {errorMessage && (
           <p className={`mt-1 text-sm text-red-700`}>{errorMessage}</p>

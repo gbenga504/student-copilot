@@ -1,3 +1,6 @@
+import { Mic } from "lucide-react";
+
+import { Button } from "~/components/button/button";
 import { Textarea } from "~/components/textarea/textarea";
 
 export const AskBar = () => {
@@ -8,6 +11,18 @@ export const AskBar = () => {
       classes={{
         container: "rounded-full pl-6 pr-3 h-15",
       }}
+      endAdornment={
+        <Button
+          element="button"
+          type="button"
+          variant="outlined"
+          colorTheme="gray"
+          shape="circle"
+          aria-label="Record audio"
+        >
+          <Mic size={16} />
+        </Button>
+      }
     />
   );
 };
