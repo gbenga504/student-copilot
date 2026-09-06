@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+
 import dayjs from "~/libs/dayjs";
 
 import type { Route } from "./+types/root";

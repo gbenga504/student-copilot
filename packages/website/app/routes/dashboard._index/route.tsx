@@ -1,9 +1,13 @@
 import { Plus } from "lucide-react";
 import { Fragment } from "react";
+
 import { Button } from "~/components/button/button";
+import { noteGroups } from "~/data/notes";
+
 import type { Route } from "../dashboard._index/+types/route";
-import { FilledState, noteGroups } from "./components/filled-state";
+
 import { EmptyState } from "./components/empty-state";
+import { FilledState } from "./components/filled-state";
 
 export function meta(_args: Route.MetaArgs) {
   return [

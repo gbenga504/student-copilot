@@ -1,0 +1,31 @@
+@reference "../../../../globals.css";
+
+@layer components {
+  .note-editor {
+    @apply flex-1 text-base text-white;
+
+    & .tiptap {
+      @apply outline-none;
+    }
+
+    & p {
+      @apply my-2;
+    }
+
+    & ul {
+      @apply list-disc pl-6;
+    }
+
+    & ol {
+      @apply list-decimal pl-6;
+    }
+  }
+}
+
+.note-editor .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--color-app-gray-100);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

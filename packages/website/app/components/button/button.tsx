@@ -23,14 +23,16 @@ interface CommonProps {
 export type ButtonProps = BaseButtonProps | AnchorProps | LinkProps;
 
 interface BaseButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>, CommonProps {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    CommonProps {
   element: "button";
   loading?: boolean;
   loadingText?: string | null;
 }
 
 interface AnchorProps
-  extends React.AnchorHTMLAttributes<HTMLAnchorElement>, CommonProps {
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement>,
+    CommonProps {
   element: "anchor";
 }
 
@@ -71,7 +73,7 @@ export const Button = forwardRef<
       "button-fullWidth": fullWidth,
       "button-disabled": disabled,
     },
-    className,
+    className
   );
 
   const commonKeys: (keyof CommonProps)[] = [

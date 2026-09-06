@@ -59,11 +59,11 @@
       }
 
       &.button-gray {
-        @apply border border-gray-300 text-white;
+        @apply border border-app-gray-150 text-white;
 
         &:hover,
         &:active {
-          @apply bg-gray-400;
+          @apply bg-app-gray-200;
         }
 
         &:focus-visible {
@@ -78,11 +78,11 @@
 
     &.button-text {
       &.button-primary {
-        @apply text-primary;
+        @apply text-green-200;
 
         &:hover,
         &:active {
-          @apply bg-primary/5;
+          @apply bg-green-200/5;
         }
 
         &:focus-visible {

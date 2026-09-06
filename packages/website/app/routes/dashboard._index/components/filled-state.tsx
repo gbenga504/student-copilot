@@ -1,31 +1,9 @@
 import { File } from "lucide-react";
+import { Link } from "react-router";
+
+import type { Note, NoteGroup } from "~/data/notes";
 import dayjs from "~/libs/dayjs";
-
-export interface Note {
-  id: string;
-  title: string;
-  author: string;
-  createdAt: string;
-}
-
-export interface NoteGroup {
-  date: string;
-  notes: Note[];
-}
-
-export const noteGroups: NoteGroup[] = [
-  {
-    date: new Date().toISOString(),
-    notes: [
-      {
-        id: "summary-of-a-goal-getter",
-        title: "Summary of a Goal getter",
-        author: "Me",
-        createdAt: new Date().toISOString(),
-      },
-    ],
-  },
-];
+import { constructURL, ROUTE_IDS } from "~/libs/route-util";
 
 interface FilledStateProps {
   noteGroups: NoteGroup[];
@@ -34,21 +12,25 @@ interface FilledStateProps {
 export function FilledState({ noteGroups }: FilledStateProps) {
   const renderNoteRow = (note: Note) => {
     return (
-      <li
-        key={note.id}
-        tabIndex={0}
-        className="flex cursor-pointer items-center gap-3 rounded-xl p-2 outline-none hover:bg-app-gray-200 focus-visible:ring-2 focus-visible:ring-primary"
-      >
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-app-gray-150">
-          <File className="size-4" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-base text-white">{note.title}</p>
-          <p className="text-sm">{note.author}</p>
-        </div>
-        <span className="shrink-0 text-xs">
-          {dayjs(note.createdAt).format("HH:mm")}
-        </span>
+      <li key={note.id}>
+        <Link
+          to={constructURL({
+            routeId: ROUTE_IDS.noteDetailsPage,
+            params: { lang: "en", noteId: note.id },
+          })}
+          className="flex items-center gap-3 rounded-xl p-2 outline-none hover:bg-app-gray-200 focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-app-gray-150">
+            <File className="size-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-base text-white">{note.title}</p>
+            <p className="text-sm">{note.author}</p>
+          </div>
+          <span className="shrink-0 text-xs">
+            {dayjs(note.createdAt).format("HH:mm")}
+          </span>
+        </Link>
       </li>
     );
   };

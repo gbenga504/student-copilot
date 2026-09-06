@@ -1,4 +1,5 @@
 import { Outlet } from "react-router";
+
 import { Sidebar } from "~/routes/dashboard/components/sidebar";
 
 export default function DashboardPage() {

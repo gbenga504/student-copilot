@@ -2,6 +2,7 @@ import { generatePath } from "react-router";
 
 export const ROUTE_IDS = {
   dashboardHomePage: "dashboardHomePage",
+  noteDetailsPage: "noteDetailsPage",
 } as const;
 
 type Route = {
@@ -11,6 +12,7 @@ type Route = {
 
 const routes: Route[] = [
   { id: ROUTE_IDS.dashboardHomePage, path: "/dashboard" },
+  { id: ROUTE_IDS.noteDetailsPage, path: "/dashboard/notes/:noteId" },
 ];
 
 const getPath = ({
