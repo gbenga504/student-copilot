@@ -1,4 +1,4 @@
-import { AudioLines, ChevronDown, ChevronUp, Minus } from "lucide-react";
+import { AudioLines, ChevronUp, Minus } from "lucide-react";
 import classNames from "classnames";
 
 import { Button } from "~/components/button/button";
@@ -69,7 +69,12 @@ export const TranscriptionControl = ({
           onClick={onToggle}
         >
           <AudioLines size={20} />
-          {open ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+          <ChevronUp
+            size={16}
+            className={classNames("transition-transform duration-300", {
+              "-rotate-180": open,
+            })}
+          />
         </Button>
 
         <Button
