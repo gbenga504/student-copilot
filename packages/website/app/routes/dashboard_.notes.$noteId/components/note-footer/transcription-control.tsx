@@ -32,7 +32,6 @@ export const TranscriptionControl = ({
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const smoothedBarHeightsRef = useRef([...ACTIVE_MIN_BAR_HEIGHTS]);
   const streamRef = useRef<MediaStream | null>(null);
   const mountedRef = useRef(true);
@@ -86,7 +85,6 @@ export const TranscriptionControl = ({
     setRecordingError(null);
 
     if (recordingState === "paused") {
-      mediaRecorderRef.current?.resume();
       await audioContextRef.current?.resume();
       smoothedBarHeightsRef.current = [...ACTIVE_MIN_BAR_HEIGHTS];
       setBarHeights(ACTIVE_MIN_BAR_HEIGHTS);
@@ -114,17 +112,14 @@ export const TranscriptionControl = ({
       const audioContext = new AudioContext();
       const analyser = audioContext.createAnalyser();
       const source = audioContext.createMediaStreamSource(stream);
-      const mediaRecorder = new MediaRecorder(stream);
 
       // MediaRecorder captures audio; the analyser reads it without playing it back.
       analyser.fftSize = 256;
       analyser.smoothingTimeConstant = 0.6;
       source.connect(analyser);
-      mediaRecorder.start(1_000);
 
       analyserRef.current = analyser;
       audioContextRef.current = audioContext;
-      mediaRecorderRef.current = mediaRecorder;
       streamRef.current = stream;
       smoothedBarHeightsRef.current = [...ACTIVE_MIN_BAR_HEIGHTS];
       setBarHeights(ACTIVE_MIN_BAR_HEIGHTS);
@@ -141,7 +136,6 @@ export const TranscriptionControl = ({
   };
 
   const pauseRecording = () => {
-    mediaRecorderRef.current?.pause();
     void audioContextRef.current?.suspend();
     setRecordingState("paused");
     stopVisualizer();
@@ -167,10 +161,6 @@ export const TranscriptionControl = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
 
-      if (mediaRecorderRef.current?.state !== "inactive") {
-        mediaRecorderRef.current?.stop();
-      }
-
       streamRef.current?.getTracks().forEach((track) => {
         track.stop();
       });
@@ -186,7 +176,7 @@ export const TranscriptionControl = ({
       >
         {barHeights.map((height, index) => (
           <span
-            className="w-[3px] rounded-full bg-current transition-[height] duration-75"
+            className="w-0.75 rounded-full bg-current transition-[height] duration-75"
             key={index}
             style={{ height }}
           />
