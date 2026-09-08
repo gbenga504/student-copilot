@@ -1,19 +1,15 @@
 import classNames from "classnames";
 import { ChevronUp, Minus, Square } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 
 import { Button } from "~/components/button/button";
+import {
+  type AudioBarHeights,
+  useAudioVisualizer,
+} from "~/hooks/use-audio-visualizer";
 
-// Idle keeps the Granola-like silhouette; active minimums make silence visibly quiet.
-const IDLE_BAR_HEIGHTS = [10, 22, 16];
-const ACTIVE_MIN_BAR_HEIGHTS = [4, 7, 5];
-const ACTIVE_MAX_BAR_HEIGHTS = [21, 28, 24];
-// Each bar listens to a different part of the speech-frequency range.
-const FREQUENCY_BANDS = [
-  [1, 5],
-  [5, 12],
-  [12, 28],
-] as const;
+const IDLE_BAR_HEIGHTS: AudioBarHeights = [10, 22, 16];
+const ACTIVE_MIN_BAR_HEIGHTS: AudioBarHeights = [4, 7, 5];
+const ACTIVE_MAX_BAR_HEIGHTS: AudioBarHeights = [21, 28, 24];
 
 interface TranscriptionButtonProps {
   open: boolean;
@@ -24,149 +20,16 @@ export const TranscriptionControl = ({
   open,
   onToggle,
 }: TranscriptionButtonProps) => {
-  const [barHeights, setBarHeights] = useState(IDLE_BAR_HEIGHTS);
-  const [recordingState, setRecordingState] = useState<
-    "idle" | "starting" | "recording" | "paused"
-  >("idle");
-  const [recordingError, setRecordingError] = useState<string | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const smoothedBarHeightsRef = useRef([...ACTIVE_MIN_BAR_HEIGHTS]);
-  const streamRef = useRef<MediaStream | null>(null);
-  const mountedRef = useRef(true);
-
-  const stopVisualizer = () => {
-    if (animationFrameRef.current !== null) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-
-    setBarHeights(IDLE_BAR_HEIGHTS);
-  };
-
-  const updateVisualizer = () => {
-    const analyser = analyserRef.current;
-
-    if (!analyser) {
-      return;
-    }
-
-    const frequencies = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(frequencies);
-
-    // Independent frequency averages stop all three bars from moving in unison.
-    const nextBarHeights = FREQUENCY_BANDS.map(([start, end], index) => {
-      let bandTotal = 0;
-
-      for (let frequencyIndex = start; frequencyIndex < end; frequencyIndex++) {
-        bandTotal += frequencies[frequencyIndex];
-      }
-
-      const average = bandTotal / (end - start) / 255;
-      const volume = Math.min(1, Math.max(0, (average - 0.06) * 2.4));
-      const minimumHeight = ACTIVE_MIN_BAR_HEIGHTS[index];
-      const targetHeight =
-        minimumHeight +
-        volume * (ACTIVE_MAX_BAR_HEIGHTS[index] - minimumHeight);
-      const previousHeight = smoothedBarHeightsRef.current[index];
-      // Rise quickly on speech, then fall slowly for fluid motion instead of jitter.
-      const smoothing = targetHeight > previousHeight ? 0.45 : 0.18;
-
-      return previousHeight + (targetHeight - previousHeight) * smoothing;
-    });
-
-    smoothedBarHeightsRef.current = nextBarHeights;
-    setBarHeights(nextBarHeights.map(Math.round));
-    animationFrameRef.current = requestAnimationFrame(updateVisualizer);
-  };
-
-  const startRecording = async () => {
-    setRecordingError(null);
-
-    if (recordingState === "paused") {
-      await audioContextRef.current?.resume();
-      smoothedBarHeightsRef.current = [...ACTIVE_MIN_BAR_HEIGHTS];
-      setBarHeights(ACTIVE_MIN_BAR_HEIGHTS);
-      setRecordingState("recording");
-      updateVisualizer();
-      return;
-    }
-
-    setRecordingState("starting");
-
-    try {
-      if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
-        throw new Error("Audio recording is not supported in this browser.");
-      }
-
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      if (!mountedRef.current) {
-        stream.getTracks().forEach((track) => {
-          track.stop();
-        });
-        return;
-      }
-
-      const audioContext = new AudioContext();
-      const analyser = audioContext.createAnalyser();
-      const source = audioContext.createMediaStreamSource(stream);
-
-      // MediaRecorder captures audio; the analyser reads it without playing it back.
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.6;
-      source.connect(analyser);
-
-      analyserRef.current = analyser;
-      audioContextRef.current = audioContext;
-      streamRef.current = stream;
-      smoothedBarHeightsRef.current = [...ACTIVE_MIN_BAR_HEIGHTS];
-      setBarHeights(ACTIVE_MIN_BAR_HEIGHTS);
-      setRecordingState("recording");
-      updateVisualizer();
-    } catch (error) {
-      setRecordingState("idle");
-      setRecordingError(
-        error instanceof Error
-          ? error.message
-          : "Unable to access the microphone.",
-      );
-    }
-  };
-
-  const pauseRecording = () => {
-    void audioContextRef.current?.suspend();
-    setRecordingState("paused");
-    stopVisualizer();
-  };
-
-  const handleRecordingToggle = () => {
-    if (recordingState === "recording") {
-      pauseRecording();
-      return;
-    }
-
-    void startRecording();
-  };
-
-  useEffect(function releaseMicrophoneOnUnmount() {
-    mountedRef.current = true;
-
-    return () => {
-      // Releasing every browser audio resource also turns off the microphone indicator.
-      mountedRef.current = false;
-
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-
-      streamRef.current?.getTracks().forEach((track) => {
-        track.stop();
-      });
-      void audioContextRef.current?.close();
-    };
-  }, []);
+  const {
+    barHeights,
+    error: recordingError,
+    state: recordingState,
+    toggleRecording: handleToggleRecording,
+  } = useAudioVisualizer({
+    idleBarHeights: IDLE_BAR_HEIGHTS,
+    activeMinBarHeights: ACTIVE_MIN_BAR_HEIGHTS,
+    activeMaxBarHeights: ACTIVE_MAX_BAR_HEIGHTS,
+  });
 
   const renderAudioBars = () => {
     return (
@@ -263,7 +126,7 @@ export const TranscriptionControl = ({
             recordingState === "recording" ? "Pause recording" : undefined
           }
           aria-pressed={recordingState === "recording"}
-          onClick={handleRecordingToggle}
+          onClick={handleToggleRecording}
         >
           {recordingState === "recording" ? (
             <Square size={12} fill="currentColor" aria-hidden="true" />
@@ -271,6 +134,7 @@ export const TranscriptionControl = ({
             "Resume"
           )}
         </Button>
+
         {recordingError && (
           <span className="sr-only" role="status">
             {recordingError}
