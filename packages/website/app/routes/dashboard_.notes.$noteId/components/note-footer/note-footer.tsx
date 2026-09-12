@@ -1,6 +1,7 @@
+import { useState } from "react";
+
 import { AskBar } from "./ask-bar";
 import { TranscriptionControl } from "./transcription-control";
-import { useState } from "react";
 
 export const NoteFooter = () => {
   const [isTranscriptionControlOpen, setIsTranscriptionControlOpen] =

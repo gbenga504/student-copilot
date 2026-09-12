@@ -3,12 +3,25 @@ import { useParams } from "react-router";
 
 import { Button } from "~/components/button/button";
 import { getNoteByIdOrThrow } from "~/data/notes";
+import { requireUser } from "~/libs/auth.server";
 import dayjs from "~/libs/dayjs";
+import {
+  loaderWithServerContext,
+  type ServerRouteContext,
+} from "~/libs/route-api.server";
 import { constructURL, ROUTE_IDS } from "~/libs/route-util";
 
 import type { Route } from "./+types/route";
 import { NoteEditor } from "./components/note-editor/note-editor";
 import { NoteFooter } from "./components/note-footer/note-footer";
+
+export const loader = loaderWithServerContext(
+  async ({ api, request }: Route.LoaderArgs & ServerRouteContext) => {
+    await requireUser({ api, request });
+
+    return null;
+  }
+);
 
 export function meta({ params }: Route.MetaArgs) {
   const note = getNoteByIdOrThrow(params.noteId);

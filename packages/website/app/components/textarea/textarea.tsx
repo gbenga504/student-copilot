@@ -22,7 +22,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       endAdornment,
       ...rest
     },
-    ref,
+    ref
   ) => {
     return (
       <div
@@ -31,7 +31,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           {
             "w-full": fullWidth,
           },
-          classes?.container,
+          classes?.container
         )}
       >
         {label && (
@@ -57,5 +57,5 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
         )}
       </div>
     );
-  },
+  }
 );

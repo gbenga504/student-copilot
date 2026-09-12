@@ -1,0 +1,42 @@
+@reference "../../globals.css";
+
+@layer components {
+  .modal-root {
+    @apply fixed inset-0 z-20 flex items-center justify-center bg-black/70 p-4;
+    animation: modal-backdrop-in 180ms ease-out;
+  }
+
+  .modal-container {
+    @apply relative w-full max-w-md rounded-lg border border-app-gray-150;
+    @apply bg-app-gray-400 p-6 text-app-gray-100 shadow-2xl;
+    animation: modal-content-in 220ms ease-out;
+  }
+
+  .modal-close-button {
+    @apply absolute right-4 top-4;
+  }
+
+  .modal-title {
+    @apply mb-2 pr-8 text-xl font-semibold leading-normal text-white;
+  }
+}
+
+@keyframes modal-backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-root,
+  .modal-container {
+    animation: none;
+  }
+}

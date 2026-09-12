@@ -84,7 +84,7 @@ export const TranscriptionControl = ({
         {
           "w-full rounded-4xl": open,
           "rounded-full": !open,
-        },
+        }
       )}
     >
       {open && renderHeader()}

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -7,6 +8,9 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+import { getBrowserApiClient } from "~/api/api";
+import { ApiProvider } from "~/context/api-context";
+import { publicRuntimeConfig } from "~/libs/configuration/public-runtime-config";
 import dayjs from "~/libs/dayjs";
 
 import type { Route } from "./+types/root";
@@ -27,6 +31,11 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const serializedEnvironment = JSON.stringify(publicRuntimeConfig).replace(
+    /</g,
+    "\\u003c"
+  );
+
   return (
     <html lang="en">
       <head>
@@ -38,6 +47,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         {children}
         <ScrollRestoration />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV=${serializedEnvironment}`,
+          }}
+        />
         <Scripts />
       </body>
     </html>
@@ -45,9 +59,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const [api] = useState(getBrowserApiClient);
   dayjs.locale("en");
 
-  return <Outlet />;
+  return (
+    <ApiProvider api={api}>
+      <Outlet />
+    </ApiProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

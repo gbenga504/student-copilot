@@ -1,15 +1,88 @@
-import "reflect-metadata";
+import "dotenv/config";
 
-import { NestFactory } from "@nestjs/core";
+import type { Server } from "node:http";
 
-import { AppModule } from "./app.module";
-import { ConfigurationService } from "./utils/configuration/configuration.service";
+import { createApp } from "./app";
+import { createAuthController } from "./auth/auth.controller";
+import { AuthService } from "./auth/auth.service";
+import { createResolveAuthentication } from "./auth/middleware/authenticate";
+import { DrizzleAuthRepository } from "./auth/repositories/drizzle-auth.repository";
+import { JwtAccessTokenProvider } from "./utils/access-token/jwt-access-token";
+import { createConfiguration } from "./utils/configuration";
+import { createDatabaseConnection } from "./utils/database";
+import { createLogger } from "./utils/logger";
+import { ResendMailer } from "./utils/mailer/resend-mailer";
 
-async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule);
-  const configuration = app.get(ConfigurationService);
+const configuration = createConfiguration();
+const logger = createLogger(configuration.logLevel);
+const databaseConnection = createDatabaseConnection(configuration.databaseUrl);
+const accessTokenProvider = new JwtAccessTokenProvider(
+  configuration.jwtSecret,
+  configuration.jwtExpiresInSeconds
+);
+const resolveAuthentication = createResolveAuthentication(accessTokenProvider);
 
-  await app.listen(configuration.getOrDefault("PORT", 3000));
+// Auth
+const authService = new AuthService({
+  repository: new DrizzleAuthRepository(databaseConnection.database),
+  mailer: new ResendMailer(
+    configuration.resendApiKey,
+    configuration.authEmailFrom
+  ),
+  accessTokenProvider,
+  configuration: {
+    otpHashSecret: configuration.otpHashSecret,
+  },
+});
+const authRouter = createAuthController({ authService });
+
+const app = createApp({
+  authRouter,
+  logger,
+  resolveAuthentication,
+  webOrigin: configuration.webOrigin,
+});
+
+const server = app.listen(configuration.port, () => {
+  logger.info({ port: configuration.port }, "API listening");
+});
+
+registerGracefulShutdown(server);
+
+function registerGracefulShutdown(server: Server): void {
+  let isShuttingDown = false;
+
+  async function shutdown(signal: NodeJS.Signals): Promise<void> {
+    if (isShuttingDown) {
+      return;
+    }
+
+    isShuttingDown = true;
+    logger.info({ signal }, "Graceful shutdown started");
+
+    const forcedShutdown = setTimeout(() => {
+      logger.error(
+        { timeoutMs: configuration.shutdownTimeoutMs },
+        "Graceful shutdown timed out"
+      );
+      process.exit(1);
+    }, configuration.shutdownTimeoutMs);
+    forcedShutdown.unref();
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        server.close((error) => (error ? reject(error) : resolve()));
+      });
+      await databaseConnection.close();
+      logger.info("Graceful shutdown completed");
+    } catch (error) {
+      logger.error({ error }, "Graceful shutdown failed");
+      process.exitCode = 1;
+    } finally {
+      clearTimeout(forcedShutdown);
+    }
+  }
+
+  process.once("SIGINT", shutdown);
+  process.once("SIGTERM", shutdown);
 }
-
-bootstrap();

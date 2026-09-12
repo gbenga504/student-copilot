@@ -26,7 +26,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       className,
       ...rest
     },
-    ref,
+    ref
   ) => {
     return (
       <div
@@ -35,13 +35,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {
             "w-full": fullWidth,
           },
-          classes?.container,
+          classes?.container
         )}
       >
         {label && (
           <label
             htmlFor={rest.id}
-            className="block text-gray-800 font-medium text-sm mb-0.5"
+            className="block text-white font-medium text-sm mb-0.5"
           >
             {label}
             {required && <span className="text-red-700 ml-1">*</span>}
@@ -76,5 +76,5 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
       </div>
     );
-  },
+  }
 );

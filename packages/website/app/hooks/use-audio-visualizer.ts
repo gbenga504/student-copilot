@@ -123,7 +123,7 @@ export const useAudioVisualizer = ({
       setError(
         audioError instanceof Error
           ? audioError.message
-          : "Unable to access the microphone.",
+          : "Unable to access the microphone."
       );
     }
   };

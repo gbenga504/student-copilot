@@ -34,6 +34,32 @@ npm run dev
 
 Your application will be available at `http://localhost:5173`.
 
+## Backend API
+
+Browser requests use the same-origin `API_PROXY` prefix. During development,
+Vite proxies `API_PROXY/*` to `API_URL` and removes the proxy prefix. In production, the
+edge proxy must provide the same behavior by routing `/api/*` directly to the
+backend and stripping `/api` before forwarding.
+
+React Router loaders and actions bypass that proxy. They use `API_URL` directly
+and convert the incoming HTTP-only `authToken` cookie into an Authorization
+bearer header for server-to-server requests.
+
+## Configuration
+
+`server-runtime-config.server.ts` validates `process.env` with Zod and exposes
+the validated server-only values without transforming or deriving fields. The
+API loader and action wrappers provide it as `serverConfig`, alongside `api`.
+
+`public-runtime-config.ts` validates only browser-safe environment values. The
+root layout writes that unchanged result to `window.ENV` before the client
+bundle runs. Isomorphic components can import `publicRuntimeConfig` without
+importing any server configuration. Callers are responsible for conversions
+and derived values.
+
+`API_URL` remains server-only. `API_PROXY`, `API_TIMEOUT_MS`, and `NODE_ENV` are
+included in the public configuration.
+
 ## Building for Production
 
 Create a production build:
