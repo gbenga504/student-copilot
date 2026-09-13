@@ -7,6 +7,9 @@ import { createAuthController } from "./auth/auth.controller";
 import { AuthService } from "./auth/auth.service";
 import { createResolveAuthentication } from "./auth/middleware/authenticate";
 import { DrizzleAuthRepository } from "./auth/repositories/drizzle-auth.repository";
+import { createNoteController } from "./notes/note.controller";
+import { NoteService } from "./notes/note.service";
+import { DrizzleNoteRepository } from "./notes/repositories/drizzle-note.repository";
 import { JwtAccessTokenProvider } from "./utils/access-token/jwt-access-token";
 import { createConfiguration } from "./utils/configuration";
 import { createDatabaseConnection } from "./utils/database";
@@ -36,8 +39,15 @@ const authService = new AuthService({
 });
 const authRouter = createAuthController({ authService });
 
+// Notes
+const noteService = new NoteService({
+  repository: new DrizzleNoteRepository(databaseConnection.database),
+});
+const noteRouter = createNoteController({ noteService });
+
 const app = createApp({
   authRouter,
+  noteRouter,
   logger,
   resolveAuthentication,
   webOrigin: configuration.webOrigin,

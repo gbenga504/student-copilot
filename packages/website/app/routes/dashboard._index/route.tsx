@@ -1,13 +1,59 @@
-import { Plus } from "lucide-react";
 import { Fragment } from "react";
+import { redirect } from "react-router";
 
-import { Button } from "~/components/button/button";
-import { noteGroups } from "~/data/notes";
+import type { Note } from "~/api/notes";
+import { requireUser } from "~/libs/auth.server";
+import dayjs from "~/libs/dayjs";
+import {
+  actionWithServerContext,
+  loaderWithServerContext,
+  type ServerRouteContext,
+} from "~/libs/route-api.server";
+import { constructURL, ROUTE_IDS } from "~/libs/route-util";
 
 import type { Route } from "../dashboard._index/+types/route";
 
 import { EmptyState } from "./components/empty-state";
-import { FilledState } from "./components/filled-state";
+import { FilledState, type NoteGroup } from "./components/filled-state";
+import { NewNoteButton } from "./components/new-note-button";
+
+export const loader = loaderWithServerContext(
+  async ({ api, request }: Route.LoaderArgs & ServerRouteContext) => {
+    await requireUser({ api, request });
+
+    return { notes: await api.notes.list() };
+  }
+);
+
+export const action = actionWithServerContext(
+  async ({ api, request }: Route.ActionArgs & ServerRouteContext) => {
+    const formData = await request.formData();
+    const intent = formData.get("intent");
+
+    if (intent === "create") {
+      const note = await api.notes.create();
+      return redirect(
+        constructURL({
+          routeId: ROUTE_IDS.noteDetailsPage,
+          params: { lang: "en", noteId: note.id },
+        })
+      );
+    }
+
+    if (intent === "delete") {
+      const noteId = formData.get("noteId");
+
+      if (typeof noteId !== "string") {
+        throw new Response("Note ID is required", { status: 400 });
+      }
+
+      await api.notes.delete(noteId);
+      return null;
+    }
+
+    throw new Response("Unsupported action", { status: 400 });
+  }
+);
 
 export function meta(_args: Route.MetaArgs) {
   return [
@@ -16,21 +62,14 @@ export function meta(_args: Route.MetaArgs) {
   ];
 }
 
-export default function DashboardIndexPage() {
+export default function DashboardIndexPage({ loaderData }: Route.ComponentProps) {
+  const noteGroups = groupNotesByDate(loaderData.notes);
   const hasNotes = noteGroups.length > 0;
 
   const renderHeader = () => {
     return (
       <header className="flex justify-end px-6 py-4">
-        <Button
-          element="button"
-          type="button"
-          variant="contained"
-          colorTheme="primary"
-        >
-          <Plus className="size-4" />
-          New note
-        </Button>
+        <NewNoteButton />
       </header>
     );
   };
@@ -51,4 +90,18 @@ export default function DashboardIndexPage() {
       {renderMainContent()}
     </Fragment>
   );
+}
+
+function groupNotesByDate(notes: Note[]): NoteGroup[] {
+  const groups = new Map<string, Note[]>();
+
+  for (const note of notes) {
+    const date = dayjs(note.createdAt).format("YYYY-MM-DD");
+    groups.set(date, [...(groups.get(date) ?? []), note]);
+  }
+
+  return Array.from(groups, ([date, groupedNotes]) => ({
+    date,
+    notes: groupedNotes,
+  }));
 }

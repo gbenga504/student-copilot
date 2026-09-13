@@ -15,6 +15,7 @@ import { createRequestLogger, type Logger } from "./utils/logger";
 
 export type AppDependencies = {
   authRouter: Router;
+  noteRouter: Router;
   logger: Logger;
   resolveAuthentication: RequestHandler;
   webOrigin: string;
@@ -31,6 +32,7 @@ export function createApp(dependencies: AppDependencies): Express {
   app.use(express.json());
   app.use("/health", createHealthController());
   app.use("/auth", dependencies.authRouter);
+  app.use("/notes", dependencies.noteRouter);
   app.use(notFoundHandler);
   app.use(createErrorHandler(dependencies.logger));
 

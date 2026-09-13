@@ -3,6 +3,7 @@ import axios from "axios";
 import { publicRuntimeConfig } from "~/libs/configuration/public-runtime-config";
 
 import { AuthResource } from "./auth";
+import { NotesResource } from "./notes";
 
 type CreateApiClientOptions = {
   apiUrl: string;
@@ -23,6 +24,7 @@ export function createApiClient(options: CreateApiClientOptions) {
 
   return {
     auth: new AuthResource(httpClient),
+    notes: new NotesResource(httpClient),
   };
 }
 

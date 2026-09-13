@@ -1,7 +1,9 @@
-import { Lock, Plus, X } from "lucide-react";
+import { Lock, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "~/components/button/button";
+
+import { NewNoteButton } from "./new-note-button";
 
 export function EmptyState() {
   const [isPrivacyNoticeVisible, setIsPrivacyNoticeVisible] = useState(true);
@@ -67,15 +69,7 @@ export function EmptyState() {
     return (
       <div className="flex flex-col items-center gap-3">
         <p className="text-white">Take your first class note</p>
-        <Button
-          element="button"
-          type="button"
-          variant="contained"
-          colorTheme="gray"
-        >
-          <Plus className="size-4" />
-          New note
-        </Button>
+        <NewNoteButton colorTheme="gray" />
       </div>
     );
   };

@@ -1,8 +1,6 @@
 import { Calendar, ChevronLeft, Home, Users } from "lucide-react";
-import { useParams } from "react-router";
 
 import { Button } from "~/components/button/button";
-import { getNoteByIdOrThrow } from "~/data/notes";
 import { requireUser } from "~/libs/auth.server";
 import dayjs from "~/libs/dayjs";
 import {
@@ -16,22 +14,19 @@ import { NoteEditor } from "./components/note-editor/note-editor";
 import { NoteFooter } from "./components/note-footer/note-footer";
 
 export const loader = loaderWithServerContext(
-  async ({ api, request }: Route.LoaderArgs & ServerRouteContext) => {
+  async ({ api, params, request }: Route.LoaderArgs & ServerRouteContext) => {
     await requireUser({ api, request });
 
-    return null;
+    return { note: await api.notes.get(params.noteId) };
   }
 );
 
-export function meta({ params }: Route.MetaArgs) {
-  const note = getNoteByIdOrThrow(params.noteId);
-
-  return [{ title: note?.title ?? "Note" }];
+export function meta({ loaderData }: Route.MetaArgs) {
+  return [{ title: loaderData?.note.title ?? "Note" }];
 }
 
-export default function NoteDetailsPage() {
-  const { noteId } = useParams();
-  const note = getNoteByIdOrThrow(noteId);
+export default function NoteDetailsPage({ loaderData }: Route.ComponentProps) {
+  const { note } = loaderData;
 
   const renderHeader = () => {
     return (
@@ -64,7 +59,7 @@ export default function NoteDetailsPage() {
 
         <div className="flex items-center gap-1.5 px-3 py-1.5 text-xs">
           <Users className="size-3.5" />
-          {note.author}
+          Me
         </div>
       </div>
     );
