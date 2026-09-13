@@ -7,9 +7,7 @@ type NewNoteButtonProps = {
   colorTheme?: "primary" | "gray";
 };
 
-export function NewNoteButton({
-  colorTheme = "primary",
-}: NewNoteButtonProps) {
+export function NewNoteButton({ colorTheme = "primary" }: NewNoteButtonProps) {
   const navigation = useNavigation();
   const isCreating =
     navigation.state === "submitting" &&

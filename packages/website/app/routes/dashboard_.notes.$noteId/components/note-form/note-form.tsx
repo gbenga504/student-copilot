@@ -31,8 +31,7 @@ export function NoteForm({ note, backAction, meta }: NoteFormProps) {
   const [failedDraft, setFailedDraft] = useState<NoteDraft | null>(null);
   const isSaving = fetcher.state !== "idle";
   const normalizedTitle = title.trim();
-  const hasChanges =
-    normalizedTitle !== savedTitle || content !== savedContent;
+  const hasChanges = normalizedTitle !== savedTitle || content !== savedContent;
   const hasSaveError =
     failedDraft?.title === normalizedTitle && failedDraft.content === content;
   const canSave =

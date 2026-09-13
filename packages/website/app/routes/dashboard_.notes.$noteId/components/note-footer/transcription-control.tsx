@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { ChevronUp, Minus, Square } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 import { Button } from "~/components/button/button";
 import {
@@ -12,17 +13,21 @@ const ACTIVE_MIN_BAR_HEIGHTS: AudioBarHeights = [4, 7, 5];
 const ACTIVE_MAX_BAR_HEIGHTS: AudioBarHeights = [21, 28, 24];
 
 interface TranscriptionButtonProps {
+  autoStart: boolean;
   open: boolean;
   onToggle: () => void;
 }
 
 export const TranscriptionControl = ({
+  autoStart,
   open,
   onToggle,
 }: TranscriptionButtonProps) => {
+  const hasAutoStarted = useRef(false);
   const {
     barHeights,
     error: recordingError,
+    startRecording,
     state: recordingState,
     toggleRecording: handleToggleRecording,
   } = useAudioVisualizer({
@@ -30,6 +35,18 @@ export const TranscriptionControl = ({
     activeMinBarHeights: ACTIVE_MIN_BAR_HEIGHTS,
     activeMaxBarHeights: ACTIVE_MAX_BAR_HEIGHTS,
   });
+
+  useEffect(
+    function autoStartAudioRecording() {
+      if (!autoStart || hasAutoStarted.current) {
+        return;
+      }
+
+      hasAutoStarted.current = true;
+      startRecording();
+    },
+    [autoStart, startRecording]
+  );
 
   const renderAudioBars = () => {
     return (

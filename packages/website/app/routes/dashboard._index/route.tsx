@@ -36,6 +36,7 @@ export const action = actionWithServerContext(
         constructURL({
           routeId: ROUTE_IDS.noteDetailsPage,
           params: { lang: "en", noteId: note.id },
+          query: { recording: "auto" },
         })
       );
     }
@@ -62,7 +63,9 @@ export function meta(_args: Route.MetaArgs) {
   ];
 }
 
-export default function DashboardIndexPage({ loaderData }: Route.ComponentProps) {
+export default function DashboardIndexPage({
+  loaderData,
+}: Route.ComponentProps) {
   const noteGroups = groupNotesByDate(loaderData.notes);
   const hasNotes = noteGroups.length > 0;
 

@@ -75,7 +75,7 @@ export const useAudioVisualizer = ({
     animationFrameRef.current = requestAnimationFrame(updateVisualizer);
   };
 
-  const start = async () => {
+  const startRecording = async () => {
     setError(null);
 
     if (state === "paused") {
@@ -129,7 +129,7 @@ export const useAudioVisualizer = ({
   };
 
   const pauseRecording = () => {
-    void audioContextRef.current?.suspend();
+    audioContextRef.current?.suspend();
     setState("paused");
     stopVisualizer();
   };
@@ -140,7 +140,7 @@ export const useAudioVisualizer = ({
       return;
     }
 
-    void start();
+    startRecording();
   };
 
   useEffect(function releaseAudioResourcesOnUnmount() {
@@ -156,9 +156,9 @@ export const useAudioVisualizer = ({
       streamRef.current?.getTracks().forEach((track) => {
         track.stop();
       });
-      void audioContextRef.current?.close();
+      audioContextRef.current?.close();
     };
   }, []);
 
-  return { barHeights, error, state, toggleRecording };
+  return { barHeights, error, startRecording, state, toggleRecording };
 };

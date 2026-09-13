@@ -1,4 +1,6 @@
 import { Calendar, ChevronLeft, Home, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 
 import { Button } from "~/components/button/button";
 import { requireUser } from "~/libs/auth.server";
@@ -40,22 +42,43 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
 export default function NoteDetailsPage({ loaderData }: Route.ComponentProps) {
   const { note } = loaderData;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [autoStartRecording] = useState(
+    () => searchParams.get("recording") === "auto"
+  );
+
+  useEffect(
+    function clearAutoRecordingMarker() {
+      if (!autoStartRecording) {
+        return;
+      }
+
+      setSearchParams(
+        (currentSearchParams) => {
+          currentSearchParams.delete("recording");
+          return currentSearchParams;
+        },
+        { replace: true }
+      );
+    },
+    [autoStartRecording, setSearchParams]
+  );
 
   const renderBackButton = () => {
     return (
       <Button
-          element="link"
-          to={constructURL({
-            routeId: ROUTE_IDS.dashboardHomePage,
-            params: { lang: "en" },
-          })}
-          variant="outlined"
-          colorTheme="gray"
-          size="large"
-          className="gap-1.5 rounded-full px-3"
-        >
-          <ChevronLeft className="size-4" />
-          <Home className="size-4" />
+        element="link"
+        to={constructURL({
+          routeId: ROUTE_IDS.dashboardHomePage,
+          params: { lang: "en" },
+        })}
+        variant="outlined"
+        colorTheme="gray"
+        size="large"
+        className="gap-1.5 rounded-full px-3"
+      >
+        <ChevronLeft className="size-4" />
+        <Home className="size-4" />
       </Button>
     );
   };
@@ -85,7 +108,7 @@ export default function NoteDetailsPage({ loaderData }: Route.ComponentProps) {
         meta={renderMeta()}
       />
 
-      <NoteFooter />
+      <NoteFooter autoStartRecording={autoStartRecording} />
     </div>
   );
 }
