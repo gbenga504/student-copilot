@@ -4,7 +4,12 @@ import {
   authenticatedHandler,
   requireAuthentication,
 } from "../auth/middleware/authenticate";
-import { noteListResponseDto, noteParamsDto, noteResponseDto } from "./dtos/note.dto";
+import {
+  noteListResponseDto,
+  noteParamsDto,
+  noteResponseDto,
+  updateNoteRequestDto,
+} from "./dtos/note.dto";
 import type { NoteService } from "./note.service";
 
 export type NoteControllerDependencies = {
@@ -47,6 +52,20 @@ export function createNoteController(
       const note = await dependencies.noteService.get(
         request.authenticatedUser.sub,
         noteId
+      );
+
+      response.json(noteResponseDto.parse(serializeNote(note)));
+    })
+  );
+
+  router.patch(
+    "/:noteId",
+    authenticatedHandler(async (request, response) => {
+      const { noteId } = noteParamsDto.parse(request.params);
+      const { title, content } = updateNoteRequestDto.parse(request.body);
+      const note = await dependencies.noteService.update(
+        request.authenticatedUser.sub,
+        { noteId, title, content }
       );
 
       response.json(noteResponseDto.parse(serializeNote(note)));

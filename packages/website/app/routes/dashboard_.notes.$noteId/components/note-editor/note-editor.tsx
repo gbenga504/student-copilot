@@ -5,9 +5,10 @@ import "./note-editor.scss";
 
 interface NoteEditorProps {
   content: string;
+  onChange: (content: string) => void;
 }
 
-export function NoteEditor({ content }: NoteEditorProps) {
+export function NoteEditor({ content, onChange }: NoteEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -15,6 +16,7 @@ export function NoteEditor({ content }: NoteEditorProps) {
     ],
     content,
     immediatelyRender: false,
+    onUpdate: ({ editor }) => onChange(editor.getHTML()),
   });
 
   return <EditorContent editor={editor} className="note-editor" />;

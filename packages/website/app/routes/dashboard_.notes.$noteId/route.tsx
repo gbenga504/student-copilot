@@ -4,20 +4,33 @@ import { Button } from "~/components/button/button";
 import { requireUser } from "~/libs/auth.server";
 import dayjs from "~/libs/dayjs";
 import {
+  actionWithServerContext,
   loaderWithServerContext,
   type ServerRouteContext,
 } from "~/libs/route-api.server";
 import { constructURL, ROUTE_IDS } from "~/libs/route-util";
 
 import type { Route } from "./+types/route";
-import { NoteEditor } from "./components/note-editor/note-editor";
 import { NoteFooter } from "./components/note-footer/note-footer";
+import { NoteForm } from "./components/note-form/note-form";
 
 export const loader = loaderWithServerContext(
   async ({ api, params, request }: Route.LoaderArgs & ServerRouteContext) => {
     await requireUser({ api, request });
 
     return { note: await api.notes.get(params.noteId) };
+  }
+);
+
+export const action = actionWithServerContext(
+  async ({ api, params, request }: Route.ActionArgs & ServerRouteContext) => {
+    const body = await request.json();
+    const note = await api.notes.update(params.noteId, {
+      title: body.title,
+      content: body.content,
+    });
+
+    return { note };
   }
 );
 
@@ -28,10 +41,9 @@ export function meta({ loaderData }: Route.MetaArgs) {
 export default function NoteDetailsPage({ loaderData }: Route.ComponentProps) {
   const { note } = loaderData;
 
-  const renderHeader = () => {
+  const renderBackButton = () => {
     return (
-      <header className="flex items-center justify-between px-20 py-4">
-        <Button
+      <Button
           element="link"
           to={constructURL({
             routeId: ROUTE_IDS.dashboardHomePage,
@@ -44,8 +56,7 @@ export default function NoteDetailsPage({ loaderData }: Route.ComponentProps) {
         >
           <ChevronLeft className="size-4" />
           <Home className="size-4" />
-        </Button>
-      </header>
+      </Button>
     );
   };
 
@@ -65,21 +76,14 @@ export default function NoteDetailsPage({ loaderData }: Route.ComponentProps) {
     );
   };
 
-  const renderContent = () => {
-    return (
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 overflow-y-auto px-6">
-        <h1 className="font-serif text-3xl text-white">{note.title}</h1>
-        {renderMeta()}
-
-        <NoteEditor content={note.content} />
-      </main>
-    );
-  };
-
   return (
     <div className="flex h-screen flex-col bg-app-gray-300">
-      {renderHeader()}
-      {renderContent()}
+      <NoteForm
+        key={note.id}
+        note={note}
+        backAction={renderBackButton()}
+        meta={renderMeta()}
+      />
 
       <NoteFooter />
     </div>

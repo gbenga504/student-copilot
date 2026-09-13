@@ -1,7 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 
 import type { Database } from "../../utils/database";
-import type { NoteRepository } from "./note.repository";
+import type { NoteRepository, UpdateNoteParams } from "./note.repository";
 import { notes } from "./note.schema";
 
 export class DrizzleNoteRepository implements NoteRepository {
@@ -45,6 +45,21 @@ export class DrizzleNoteRepository implements NoteRepository {
       .from(notes)
       .where(and(eq(notes.id, id), eq(notes.userId, userId)))
       .limit(1);
+
+    return note ?? null;
+  }
+
+  async updateByIdAndUserId(userId: string, params: UpdateNoteParams) {
+    const [note] = await this.database
+      .update(notes)
+      .set({ title: params.title, content: params.content })
+      .where(and(eq(notes.id, params.noteId), eq(notes.userId, userId)))
+      .returning({
+        id: notes.id,
+        title: notes.title,
+        content: notes.content,
+        createdAt: notes.createdAt,
+      });
 
     return note ?? null;
   }

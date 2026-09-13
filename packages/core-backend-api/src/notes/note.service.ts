@@ -29,6 +29,22 @@ export class NoteService {
     return note;
   }
 
+  async update(
+    userId: string,
+    params: { noteId: string; title: string; content: string }
+  ) {
+    const note = await this.dependencies.repository.updateByIdAndUserId(
+      userId,
+      params
+    );
+
+    if (!note) {
+      throw noteNotFoundError();
+    }
+
+    return note;
+  }
+
   async delete(userId: string, noteId: string): Promise<void> {
     const wasDeleted = await this.dependencies.repository.deleteByIdAndUserId(
       noteId,
@@ -42,5 +58,9 @@ export class NoteService {
 }
 
 function noteNotFoundError(): AppError {
-  return new AppError(404, APP_ERROR_CODES.RESOURCE_NOT_FOUND, "Note not found");
+  return new AppError(
+    404,
+    APP_ERROR_CODES.RESOURCE_NOT_FOUND,
+    "Note not found"
+  );
 }
