@@ -22,6 +22,20 @@
       "when": 1789245761323,
       "tag": "0002_add_notes",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789335271971,
+      "tag": "0003_add_note_transcript_chunks",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789335492934,
+      "tag": "0004_index_note_transcript_chunks",
+      "breakpoints": true
     }
   ]
 }

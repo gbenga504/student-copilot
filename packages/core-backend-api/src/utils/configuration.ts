@@ -3,6 +3,7 @@ import { z } from "zod";
 const environmentSchema = z.object({
   AUTH_EMAIL_FROM: z.string().min(1),
   DATABASE_URL: z.string().min(1),
+  DEEPGRAM_API_KEY: z.string().min(1),
   JWT_EXPIRES_IN_SECONDS: z.coerce.number().int().positive().default(2_592_000),
   JWT_SECRET: z.string().min(16),
   LOG_LEVEL: z
@@ -18,6 +19,7 @@ const environmentSchema = z.object({
 export type Configuration = {
   authEmailFrom: string;
   databaseUrl: string;
+  deepgramApiKey: string;
   jwtExpiresInSeconds: number;
   jwtSecret: string;
   logLevel: string;
@@ -36,6 +38,7 @@ export function createConfiguration(
   return {
     authEmailFrom: parsed.AUTH_EMAIL_FROM,
     databaseUrl: parsed.DATABASE_URL,
+    deepgramApiKey: parsed.DEEPGRAM_API_KEY,
     jwtExpiresInSeconds: parsed.JWT_EXPIRES_IN_SECONDS,
     jwtSecret: parsed.JWT_SECRET,
     logLevel: parsed.LOG_LEVEL,

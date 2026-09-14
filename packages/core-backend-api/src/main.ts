@@ -15,6 +15,7 @@ import { createConfiguration } from "./utils/configuration";
 import { createDatabaseConnection } from "./utils/database";
 import { createLogger } from "./utils/logger";
 import { ResendMailer } from "./utils/mailer/resend-mailer";
+import { DeepgramTranscriptionTokenProvider } from "./utils/transcription/deepgram-transcription-token-provider";
 
 const configuration = createConfiguration();
 const logger = createLogger(configuration.logLevel);
@@ -42,6 +43,9 @@ const authRouter = createAuthController({ authService });
 // Notes
 const noteService = new NoteService({
   repository: new DrizzleNoteRepository(databaseConnection.database),
+  transcriptionTokenProvider: new DeepgramTranscriptionTokenProvider(
+    configuration.deepgramApiKey
+  ),
 });
 const noteRouter = createNoteController({ noteService });
 

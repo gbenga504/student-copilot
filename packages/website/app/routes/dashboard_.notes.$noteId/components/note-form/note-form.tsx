@@ -107,7 +107,7 @@ export function NoteForm({ note, backAction, meta }: NoteFormProps) {
             inputContainer:
               "border-0 bg-transparent px-0 py-0 focus-within:ring-0",
           }}
-          className="font-serif text-3xl text-white"
+          className="text-3xl text-white"
           onChange={(event) => setTitle(event.target.value)}
         />
         {meta}

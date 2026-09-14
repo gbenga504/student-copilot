@@ -8,6 +8,8 @@ interface UseAudioVisualizerOptions {
   idleBarHeights: AudioBarHeights;
   activeMinBarHeights: AudioBarHeights;
   activeMaxBarHeights: AudioBarHeights;
+  onRecordingPause?: () => Promise<void>;
+  onRecordingStart?: (stream: MediaStream) => Promise<void>;
 }
 
 const FREQUENCY_BANDS = [
@@ -20,6 +22,8 @@ export const useAudioVisualizer = ({
   idleBarHeights,
   activeMinBarHeights,
   activeMaxBarHeights,
+  onRecordingPause,
+  onRecordingStart,
 }: UseAudioVisualizerOptions) => {
   const [barHeights, setBarHeights] = useState(idleBarHeights);
   const [state, setState] = useState<AudioVisualizerState>("idle");
@@ -77,16 +81,6 @@ export const useAudioVisualizer = ({
 
   const startRecording = async () => {
     setError(null);
-
-    if (state === "paused") {
-      await audioContextRef.current?.resume();
-      smoothedBarHeightsRef.current = [...activeMinBarHeights];
-      setBarHeights(activeMinBarHeights);
-      setState("recording");
-      updateVisualizer();
-      return;
-    }
-
     setState("starting");
 
     try {
@@ -103,6 +97,9 @@ export const useAudioVisualizer = ({
         return;
       }
 
+      streamRef.current = stream;
+      await onRecordingStart?.(stream);
+
       const audioContext = new AudioContext();
       const analyser = audioContext.createAnalyser();
       const source = audioContext.createMediaStreamSource(stream);
@@ -113,12 +110,15 @@ export const useAudioVisualizer = ({
 
       analyserRef.current = analyser;
       audioContextRef.current = audioContext;
-      streamRef.current = stream;
       smoothedBarHeightsRef.current = [...activeMinBarHeights];
       setBarHeights(activeMinBarHeights);
       setState("recording");
       updateVisualizer();
     } catch (audioError) {
+      streamRef.current?.getTracks().forEach((track) => {
+        track.stop();
+      });
+      streamRef.current = null;
       setState("idle");
       setError(
         audioError instanceof Error
@@ -128,15 +128,31 @@ export const useAudioVisualizer = ({
     }
   };
 
-  const pauseRecording = () => {
-    audioContextRef.current?.suspend();
+  const pauseRecording = async () => {
+    try {
+      await onRecordingPause?.();
+    } catch (pauseError) {
+      setError(
+        pauseError instanceof Error
+          ? pauseError.message
+          : "Unable to pause the recording."
+      );
+    }
+
+    await audioContextRef.current?.close();
+    audioContextRef.current = null;
+    analyserRef.current = null;
+    streamRef.current?.getTracks().forEach((track) => {
+      track.stop();
+    });
+    streamRef.current = null;
     setState("paused");
     stopVisualizer();
   };
 
   const toggleRecording = () => {
     if (state === "recording") {
-      pauseRecording();
+      void pauseRecording();
       return;
     }
 

@@ -9,6 +9,33 @@ export const updateNoteRequestDto = z.object({
   content: z.string(),
 });
 
+export const appendTranscriptRequestDto = z.object({
+  chunks: z
+    .array(
+      z.object({
+        id: z.uuid(),
+        text: z.string().trim().min(1),
+      })
+    )
+    .min(1)
+    .max(100),
+});
+
+export const transcriptChunkResponseDto = z.object({
+  id: z.uuid(),
+  text: z.string(),
+  createdAt: z.iso.datetime(),
+});
+
+export const transcriptChunkListResponseDto = z.array(
+  transcriptChunkResponseDto
+);
+
+export const transcriptionTokenResponseDto = z.object({
+  accessToken: z.string().min(1),
+  expiresIn: z.number().positive(),
+});
+
 export const noteResponseDto = z.object({
   id: z.uuid(),
   title: z.string(),

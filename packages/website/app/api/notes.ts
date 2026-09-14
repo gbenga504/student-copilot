@@ -14,6 +14,19 @@ export type UpdateNoteParams = {
   content: string;
 };
 
+export type TranscriptChunk = {
+  id: string;
+  text: string;
+  createdAt: string;
+};
+
+export type PendingTranscriptChunk = Pick<TranscriptChunk, "id" | "text">;
+
+export type TranscriptionToken = {
+  accessToken: string;
+  expiresIn: number;
+};
+
 export class NotesResource {
   constructor(private readonly httpClient: AxiosInstance) {}
 
@@ -52,6 +65,41 @@ export class NotesResource {
       const response = await this.httpClient.patch<Note>(
         `/notes/${noteId}`,
         params
+      );
+
+      return response.data;
+    } catch (error) {
+      throwApiError(error);
+    }
+  }
+
+  async getTranscript(noteId: string): Promise<TranscriptChunk[]> {
+    try {
+      const response = await this.httpClient.get<TranscriptChunk[]>(
+        `/notes/${noteId}/transcript`
+      );
+
+      return response.data;
+    } catch (error) {
+      throwApiError(error);
+    }
+  }
+
+  async appendTranscript(
+    noteId: string,
+    chunks: PendingTranscriptChunk[]
+  ): Promise<void> {
+    try {
+      await this.httpClient.post(`/notes/${noteId}/transcript`, { chunks });
+    } catch (error) {
+      throwApiError(error);
+    }
+  }
+
+  async createTranscriptionToken(noteId: string): Promise<TranscriptionToken> {
+    try {
+      const response = await this.httpClient.post<TranscriptionToken>(
+        `/notes/${noteId}/transcription-token`
       );
 
       return response.data;

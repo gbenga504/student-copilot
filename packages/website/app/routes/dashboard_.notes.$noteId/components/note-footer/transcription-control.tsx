@@ -1,39 +1,42 @@
 import classNames from "classnames";
-import { ChevronUp, Minus, Square } from "lucide-react";
+import { ChevronUp, Minus, MonitorUp, Square } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import { Button } from "~/components/button/button";
-import {
-  type AudioBarHeights,
-  useAudioVisualizer,
-} from "~/hooks/use-audio-visualizer";
+import type { TranscriptChunk } from "~/api/notes";
 
-const IDLE_BAR_HEIGHTS: AudioBarHeights = [10, 22, 16];
-const ACTIVE_MIN_BAR_HEIGHTS: AudioBarHeights = [4, 7, 5];
-const ACTIVE_MAX_BAR_HEIGHTS: AudioBarHeights = [21, 28, 24];
+import { useNoteTranscription } from "./use-note-transcription";
 
 interface TranscriptionButtonProps {
   autoStart: boolean;
+  initialTranscript: TranscriptChunk[];
+  noteId: string;
   open: boolean;
   onToggle: () => void;
 }
 
 export const TranscriptionControl = ({
   autoStart,
+  initialTranscript,
+  noteId,
   open,
   onToggle,
 }: TranscriptionButtonProps) => {
   const hasAutoStarted = useRef(false);
+  const transcriptPanelRef = useRef<HTMLDivElement>(null);
   const {
     barHeights,
     error: recordingError,
+    interimTranscript,
+    isTabAudioShared,
+    shareTabAudio,
     startRecording,
     state: recordingState,
+    transcript,
     toggleRecording: handleToggleRecording,
-  } = useAudioVisualizer({
-    idleBarHeights: IDLE_BAR_HEIGHTS,
-    activeMinBarHeights: ACTIVE_MIN_BAR_HEIGHTS,
-    activeMaxBarHeights: ACTIVE_MAX_BAR_HEIGHTS,
+  } = useNoteTranscription({
+    initialTranscript,
+    noteId,
   });
 
   useEffect(
@@ -46,6 +49,18 @@ export const TranscriptionControl = ({
       startRecording();
     },
     [autoStart, startRecording]
+  );
+
+  useEffect(
+    function scrollToLatestTranscript() {
+      if (!open || !transcriptPanelRef.current) {
+        return;
+      }
+
+      transcriptPanelRef.current.scrollTop =
+        transcriptPanelRef.current.scrollHeight;
+    },
+    [interimTranscript, open, transcript]
   );
 
   const renderAudioBars = () => {
@@ -67,7 +82,22 @@ export const TranscriptionControl = ({
 
   const renderHeader = () => {
     return (
-      <div className="p-1 flex justify-end">
+      <div className="p-1 flex items-center justify-end">
+        <Button
+          element="button"
+          type="button"
+          variant="text"
+          colorTheme="gray"
+          size="medium"
+          className="gap-1 hover:bg-app-gray-150"
+          disabled={recordingState !== "recording" || isTabAudioShared}
+          aria-pressed={isTabAudioShared}
+          onClick={shareTabAudio}
+        >
+          <MonitorUp size={16} aria-hidden="true" />
+          {isTabAudioShared ? "Tab shared" : "Share tab audio"}
+        </Button>
+
         <Button
           element="button"
           type="button"
@@ -86,10 +116,26 @@ export const TranscriptionControl = ({
 
   const renderTranscribedMessagesPanel = () => {
     return (
-      <div className="p-2 max-h-120 min-h-15 border-y border-y-app-gray-150">
-        <p className="text-xs text-center">
+      <div
+        className="scrollbar-hidden flex max-h-120 min-h-15.5 flex-col gap-1 overflow-y-auto border-y border-y-app-gray-150 p-2"
+        ref={transcriptPanelRef}
+      >
+        <p className="mb-2 text-center text-xs">
           Always get consent when transcribing others.
         </p>
+        {transcript.map((chunk) => (
+          <p
+            className="w-fit max-w-[92%] rounded-lg bg-app-gray-150 px-2 py-1 text-sm leading-5 text-white"
+            key={chunk.id}
+          >
+            {chunk.text}
+          </p>
+        ))}
+        {interimTranscript && (
+          <p className="w-fit max-w-[92%] rounded-lg bg-app-gray-150/60 px-2 py-1 text-sm leading-5 text-white">
+            {interimTranscript}
+          </p>
+        )}
       </div>
     );
   };
@@ -97,10 +143,10 @@ export const TranscriptionControl = ({
   return (
     <div
       className={classNames(
-        "flex flex-col border border-app-gray-150 bg-app-gray-200 h-full p-1",
+        "flex flex-col border border-app-gray-150 bg-app-gray-200 p-1",
         {
           "w-full rounded-4xl": open,
-          "rounded-full": !open,
+          "h-15.5 rounded-full": !open,
         }
       )}
     >
@@ -108,8 +154,9 @@ export const TranscriptionControl = ({
       {open && renderTranscribedMessagesPanel()}
 
       <div
-        className={classNames("flex items-center h-full min-h-15", {
-          "pt-1": open,
+        className={classNames("flex flex-none items-center", {
+          "h-15.5 pt-1": open,
+          "h-full": !open,
         })}
       >
         <Button

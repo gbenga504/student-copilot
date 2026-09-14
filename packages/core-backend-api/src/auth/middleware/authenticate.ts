@@ -42,7 +42,9 @@ export function createResolveAuthentication(
       return;
     }
 
-    const cookieToken = request.cookies[AUTH_TOKEN_COOKIE_NAME];
+    const cookieToken = decodeAuthTokenCookie(
+      request.cookies[AUTH_TOKEN_COOKIE_NAME]
+    );
     const token = bearerToken ?? cookieToken;
 
     if (!token) {
@@ -91,4 +93,20 @@ function unauthorizedError(): AppError {
     APP_ERROR_CODES.AUTH_UNAUTHORIZED,
     "Authentication required"
   );
+}
+
+function decodeAuthTokenCookie(value: unknown): unknown {
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  try {
+    const decodedValue: unknown = JSON.parse(
+      Buffer.from(value, "base64").toString("utf8")
+    );
+
+    return typeof decodedValue === "string" ? decodedValue : value;
+  } catch {
+    return value;
+  }
 }

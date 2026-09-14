@@ -1,0 +1,1 @@
+CREATE INDEX "note_transcript_chunks_note_id_created_at_index" ON "note_transcript_chunks" USING btree ("note_id","created_at");

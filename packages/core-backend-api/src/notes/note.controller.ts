@@ -5,9 +5,12 @@ import {
   requireAuthentication,
 } from "../auth/middleware/authenticate";
 import {
+  appendTranscriptRequestDto,
   noteListResponseDto,
   noteParamsDto,
   noteResponseDto,
+  transcriptionTokenResponseDto,
+  transcriptChunkListResponseDto,
   updateNoteRequestDto,
 } from "./dtos/note.dto";
 import type { NoteService } from "./note.service";
@@ -42,6 +45,53 @@ export function createNoteController(
       );
 
       response.json(noteListResponseDto.parse(notes.map(serializeNote)));
+    })
+  );
+
+  router.get(
+    "/:noteId/transcript",
+    authenticatedHandler(async (request, response) => {
+      const { noteId } = noteParamsDto.parse(request.params);
+      const chunks = await dependencies.noteService.getTranscript(
+        request.authenticatedUser.sub,
+        noteId
+      );
+
+      response.json(
+        transcriptChunkListResponseDto.parse(
+          chunks.map((chunk) => ({
+            ...chunk,
+            createdAt: chunk.createdAt.toISOString(),
+          }))
+        )
+      );
+    })
+  );
+
+  router.post(
+    "/:noteId/transcript",
+    authenticatedHandler(async (request, response) => {
+      const { noteId } = noteParamsDto.parse(request.params);
+      const { chunks } = appendTranscriptRequestDto.parse(request.body);
+      await dependencies.noteService.appendTranscript(
+        request.authenticatedUser.sub,
+        { noteId, chunks }
+      );
+
+      response.status(204).send();
+    })
+  );
+
+  router.post(
+    "/:noteId/transcription-token",
+    authenticatedHandler(async (request, response) => {
+      const { noteId } = noteParamsDto.parse(request.params);
+      const token = await dependencies.noteService.createTranscriptionToken(
+        request.authenticatedUser.sub,
+        noteId
+      );
+
+      response.json(transcriptionTokenResponseDto.parse(token));
     })
   );
 

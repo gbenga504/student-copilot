@@ -20,7 +20,12 @@ export const loader = loaderWithServerContext(
   async ({ api, params, request }: Route.LoaderArgs & ServerRouteContext) => {
     await requireUser({ api, request });
 
-    return { note: await api.notes.get(params.noteId) };
+    const [note, transcript] = await Promise.all([
+      api.notes.get(params.noteId),
+      api.notes.getTranscript(params.noteId),
+    ]);
+
+    return { note, transcript };
   }
 );
 
@@ -41,7 +46,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
 }
 
 export default function NoteDetailsPage({ loaderData }: Route.ComponentProps) {
-  const { note } = loaderData;
+  const { note, transcript } = loaderData;
   const [searchParams, setSearchParams] = useSearchParams();
   const [autoStartRecording] = useState(
     () => searchParams.get("recording") === "auto"
@@ -108,7 +113,11 @@ export default function NoteDetailsPage({ loaderData }: Route.ComponentProps) {
         meta={renderMeta()}
       />
 
-      <NoteFooter autoStartRecording={autoStartRecording} />
+      <NoteFooter
+        autoStartRecording={autoStartRecording}
+        initialTranscript={transcript}
+        noteId={note.id}
+      />
     </div>
   );
 }

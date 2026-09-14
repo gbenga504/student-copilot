@@ -1,4 +1,11 @@
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  index,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 import { users } from "../../auth/repositories/auth.schema";
 
@@ -13,3 +20,23 @@ export const notes = pgTable("notes", {
     .defaultNow()
     .notNull(),
 });
+
+export const noteTranscriptChunks = pgTable(
+  "note_transcript_chunks",
+  {
+    id: uuid("id").primaryKey(),
+    noteId: uuid("note_id")
+      .notNull()
+      .references(() => notes.id, { onDelete: "cascade" }),
+    text: text("text").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("note_transcript_chunks_note_id_created_at_index").on(
+      table.noteId,
+      table.createdAt
+    ),
+  ]
+);
